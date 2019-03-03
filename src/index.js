@@ -1,141 +1,67 @@
 module.exports = function solveSudoku(sudokuArr) {
- 
-  function getCords(arr) {
-      var cordArr = [];
-      for (var i = 0; i < arr.length; i++) {
-        for (var j = 0; j < arr[i].length; j++) {
-          if (arr[i][j] === 0) {
-            cordArr.push([i, j]);
+   
+  function getCords(mainArr) {
+    const cordArr = [];
+
+      for (let i = 0; i < mainArr.length; i++) {
+        for (let j = 0; j < mainArr[i].length; j++) {
+          if (mainArr[i][j] === 0) {
+            cordArr.push(i, j);
+            return cordArr;
           }
         }
       }
-      return cordArr;
+      return false;
+  }
+
+  function horisontalCollect(mainArr, cordY) { 
+    const matchArr = [];
+
+    mainArr.forEach((e, i) => {
+      if(mainArr[cordY][i] !== 0) {
+        matchArr.push(mainArr[cordY][i]);
+      }
+    });
+
+    return matchArr;
   }
   
-
-
-
-
-  function getSquare(b, a) {
-    var hor = [];
-    var vert = [];
+  function verticalCollect(mainArr, cordX, horColl) {
+    const newArr = [];
     
-    switch(b) {
-      case 0:
-      case 1:
-      case 2:
-        vert = [0, 1, 2];
-        switch(a) {
-          case 0:
-          case 1:
-          case 2:
-            hor = [0, 1, 2];
-            break;
-          case 3:
-          case 4:
-          case 5:
-            hor = [3, 4, 5];
-            break;
-          case 6:
-          case 7:
-          case 8:
-            hor = [6, 7, 8];
-            break;
-        }
-        break;
-      case 3:
-      case 4:
-      case 5:
-        vert = [3, 4, 5];
-        switch(a) {
-          case 0:
-          case 1:
-          case 2:
-            hor = [0, 1, 2];
-            break;
-          case 3:
-          case 4:
-          case 5:
-            hor = [3, 4, 5];
-            break;
-          case 6:
-          case 7:
-          case 8:
-            hor = [6, 7, 8];
-            break;
-        }
-        break;
-      case 6:
-      case 7:
-      case 8:
-        vert = [6, 7, 8];
-        switch(a) {
-          case 0:
-          case 1:
-          case 2:
-            hor = [0, 1, 2];
-            break;
-          case 3:
-          case 4:
-          case 5:
-            hor = [3, 4, 5];
-            break;
-          case 6:
-          case 7:
-          case 8:
-            hor = [6, 7, 8];
-            break;
-        }
-        break;
-    }
-    var square = {a: hor, b: vert};
-    return square;
+    mainArr.forEach((e, i) => {
+      if (mainArr[i][cordX] !== 0) {
+        newArr.push(mainArr[i][cordX]);  
+      }
+    });
+
+    return horColl.concat(newArr.filter((e) => horColl.indexOf(e) === -1));
   }
-  function squareCollect(arr, b, a) {
-    var matchArr = [];
-    var square = getSquare(b, a);
-    var hor = square.a;
-    var vert = square.b;
+
+  
+  function squareCollect(mainArr, cordY, cordX, vertColl) {
+    const localArr = [];
+
+    let row = Math.floor(cordY / 3) * 3;
+    let col = Math.floor(cordX / 3) * 3;
     
-    for (var i = 0; i < 3; i++) {
-      for (var j = 0; j < 3; j++) {
-        if (arr[vert[i]][hor[j]] !== 0) {
-          matchArr.push(arr[vert[i]][hor[j]]);
+    for (let i = 0; i < 3; i++) {
+      for (let j = 0; j < 3; j++) {
+        if (mainArr[row + i][col + j] !== 0) {
+          localArr.push(mainArr[row + i][col + j]);
         }  
       }          
     }
     
-    return matchArr;
+    return vertColl.concat(localArr.filter((e) => vertColl.indexOf(e) === -1));
   }
-  function horisontalCollect(arr, b) { 
-    var matchArr = [];
-    
-    for (var i = 0; i < arr[b].length; i++) {
-      if(arr[b][i] !== 0) {
-        matchArr.push(arr[b][i]);
-        
-      }
-          
-    }
-    return matchArr; 
-  }
-  function verticalCollect(arr, a) {
-    var matchArr = [];
-    
-    for (var i = 0; i < arr.length; i++) {
-      if (arr[i][a] !== 0) {
-        matchArr.push(arr[i][a]);
-      }
-    }
-    
-    return matchArr;
-  }
-  function getTotalResult(arr) {
-    var arrTen = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   
-    for (var i = 0; i < arrTen.length; i++) {
-      for (var j = 0; j < arr.length; j++) {
-        if(arrTen[i] === arr[j]) {
+  function getTotalResult(sqrColl) {
+    const arrTen = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  
+    for (let i = 0; i < arrTen.length; i++) {
+      for (let j = 0; j < sqrColl.length; j++) {
+        if(arrTen[i] === sqrColl[j]) {
           arrTen.splice(i, 1);
           i--;
         }
@@ -144,164 +70,104 @@ module.exports = function solveSudoku(sudokuArr) {
     
     return arrTen;
   }
-
-  function checkMatches(array1, array2) {
-    for (var i = 0; i < array1.length; i++) {
-      for (var j = 0; j < array2.length; j++) {
-        if (array1[i] == array2[j]) {
-          array2.splice(j, 1);
-          j--;
-        }
-      }
-    }
-    var arr = array1.concat(array2);
-    return arr;
-  }
-  function getResultArr(arr1, arr2, arr3) {
-        
-        
-    var arr = checkMatches(arr1, arr2);
-    var result = checkMatches(arr, arr3);
-    
-    return result;
-  }
-
-  function availableIntengers(arr, b, a) {
-      let hor = horisontalCollect(arr, b);
-      let vert = verticalCollect(arr, a);
-      let sqr = squareCollect(arr, b, a);
-      let getRslt = getResultArr(hor, vert, sqr);
-      
-      return getTotalResult(getRslt);
-  }
-     
-  function getAvailableArr(arr) {
-      let availableArr = [];
-      let getCordsArr = getCords(arr);
   
-    for (var i = 0; i < getCordsArr.length; i++) {
-      availableArr.push(availableIntengers(arr, getCordsArr[i][0], getCordsArr[i][1]));
-    }
+  function availableIntengers(mainArr, cordY, cordX) {
+    
+    let horColl = horisontalCollect(mainArr, cordY);
+    let vertColl = verticalCollect(mainArr, cordX, horColl);
+    let sqrColl = squareCollect(mainArr, cordY, cordX, vertColl);
+    
+      
+      return getTotalResult(sqrColl);
+  }
+  
+  function getAvailableArr(mainArr) {
+      let availableArr = [];
+      let getCordsArr = getCords(mainArr);
+  
+        availableArr.push(availableIntengers(mainArr, getCordsArr[0], getCordsArr[1]));
+    
     return availableArr;
   }
   
-  function whetherTrue(arr) {
-      let whetherTrue = getAvailableArr(arr).some((elem) => {
-        if (elem.length === 1) {
-          return true;
-        } else {
-          return false;
-        }
-      });
-      return whetherTrue;
-  }
+  function fillFinal(mainArr, currentAvVar) {
   
+    const newArr1 = mainArr.map((e, i, arr) => {
+      return [...arr[i]];
+    });
+    const cordY = getCords(mainArr)[0];
+    const cordX = getCords(mainArr)[1];
   
-  function fillSingle(arr) {
-      if (whetherTrue(arr)) {
-        
-        for (var i = 0; i < getAvailableArr(arr).length; i++) {
-          if (getAvailableArr(arr)[i].length == 1) {
-            arr[getCords(arr)[i][0]][getCords(arr)[i][1]] = getAvailableArr(arr)[i][0];
-          }  
-        }
-      }
-  }
-  function fillArraySingle(arr) {
-      for (var j = 0; j < getAvailableArr(arr).length; j++) {
-        fillSingle(arr);
-      }
-  }
+    newArr1[cordY][cordX] = currentAvVar.shift();
     
-  function wetherSingle(arr) {
-      
-      if (whetherTrue(arr)) {
-        fillArraySingle(arr);
-      }
-  }
-  function qwerty(arr, a, b) {
-  
-    let newArr1 = arr.map((e) => {
-      return e.slice();
-    })
-    let cords = getCords(newArr1);
-  
-    newArr1[cords[a][0]][cords[a][1]] = getAvailableArr(newArr1)[a][b];
     
-    wetherSingle(newArr1);
     return newArr1;
   }
   
-  function wetherEmptySell(arr) {
-    let wetherEmptyCell = getAvailableArr(arr).some((elem) => {
-      if (elem.length == 0) {
-        return true;
-      } else {
-        return false;
-      }
+  function wetherEmptyCell(mainArr) {
+
+  
+    return getAvailableArr(mainArr).some((elem) => {
+      return (elem.length == 0) ? true : false;
     });
-    return wetherEmptyCell;
+  
+
   }
-  function wetherEmpty(arr1, arr3) {
-      
+
+  function wetherEmpty(mainArr, backUpArr) {
     
-  
-    if (wetherEmptySell(arr1)) {
-  
-      good:   
+    if (wetherEmptyCell(mainArr)) {
+
+
+      good:
       for (;;) {  
-        if (arr3[arr3.length - 1].handle === 1) {
-          arr3.pop();
-          continue good;  
-        } else { 
-          arr3[arr3.length - 1].handle++; 
+        if (backUpArr[backUpArr.length - 1].arrVar.length === 0) {
+          backUpArr.pop();
+          continue good;
+        } else {
           break;
         }
       }
-  
-    arr1 = arr3[arr3.length - 1].arr.map((e) => {
-      return e.slice();
+
+      mainArr = backUpArr[backUpArr.length - 1].arr.map((e, i, arr) => {
+        return [...arr[i]];
       });
     } else {
-      arr3.push({arr: arr1, handle: 0});
+      backUpArr.push({arr: mainArr, arrVar: []});
+      for (var i = 0; i < getAvailableArr(mainArr)[0].length; i++) {
+        backUpArr[backUpArr.length - 1].arrVar.push(getAvailableArr(mainArr)[0][i]);
+      }
     }
   }
   
-  fillArraySingle(sudokuArr);
-
-  let newArr = sudokuArr.map((e) => {
-    return e.slice();
+  let newArr = sudokuArr.map((e, i, arr) => {
+    return [...arr[i]];
   });
   
-  let backUp = [];
+  const backUp = [];
   
-  backUp.push({arr: newArr, handle: 0});
   
+  backUp.push({arr: newArr, arrVar: []});
+  
+
+  for (var i = 0; i < getAvailableArr(newArr)[0].length; i++) {
+    backUp[0].arrVar.push(getAvailableArr(newArr)[0][i]);
+  }
+
   
   let newArr1 = [];
   
   
-  
-  
-  for (; getAvailableArr(backUp[backUp.length - 1].arr)[0] !== undefined;) {
-    let i = 0;
-    
-    for (var j = 0; j < getAvailableArr(backUp[backUp.length - 1].arr).length; j++) {
-      if (getAvailableArr(backUp[backUp.length - 1].arr)[j].length === 2) {
-        i += j;
-        break;
-      }
+  do {
+
+    newArr1 = fillFinal(backUp[backUp.length - 1].arr, backUp[backUp.length - 1].arrVar);
+
+    if (getCords(newArr1) !== false) {
+      wetherEmpty(newArr1, backUp);
     }
-    
-    newArr1 = qwerty(backUp[backUp.length - 1].arr, i, backUp[backUp.length - 1].handle);
-    
-    wetherEmpty(newArr1, backUp);
-    
-    }
+
+  } while (getCords(newArr1))
   
   
-  sudokuArr = newArr1;
-  
-  
-  return sudokuArr;
+  return newArr1;
 }
