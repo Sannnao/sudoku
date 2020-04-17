@@ -1,173 +1,122 @@
-module.exports = function solveSudoku(sudokuArr) {
-   
+function solveSudoku(sudokuArr) {
   function getCords(mainArr) {
     const cordArr = [];
 
-      for (let i = 0; i < mainArr.length; i++) {
-        for (let j = 0; j < mainArr[i].length; j++) {
-          if (mainArr[i][j] === 0) {
-            cordArr.push(i, j);
-            return cordArr;
-          }
+    for (let i = 0; i < mainArr.length; i++) {
+      for (let j = 0; j < mainArr[i].length; j++) {
+        if (mainArr[i][j] === 0) {
+          cordArr.push(i, j);
+          return cordArr;
         }
       }
-      return false;
+    }
+
+    return cordArr;
   }
 
-  function horisontalCollect(mainArr, cordY) { 
+  function horisontalCollect(mainArr, cordY) {
     const matchArr = [];
 
     mainArr.forEach((e, i) => {
-      if(mainArr[cordY][i] !== 0) {
+      if (mainArr[cordY][i] !== 0) {
         matchArr.push(mainArr[cordY][i]);
       }
     });
 
     return matchArr;
   }
-  
-  function verticalCollect(mainArr, cordX, horColl) {
-    const newArr = [];
-    
+
+  function verticalCollect(mainArr, cordX) {
+    const matchArr = [];
+
     mainArr.forEach((e, i) => {
       if (mainArr[i][cordX] !== 0) {
-        newArr.push(mainArr[i][cordX]);  
+        matchArr.push(mainArr[i][cordX]);
       }
     });
 
-    return horColl.concat(newArr.filter((e) => horColl.indexOf(e) === -1));
+    return matchArr;
   }
 
-  
-  function squareCollect(mainArr, cordY, cordX, vertColl) {
-    const localArr = [];
+  function squareCollect(mainArr, cordY, cordX) {
+    const matchArr = [];
 
-    let row = Math.floor(cordY / 3) * 3;
-    let col = Math.floor(cordX / 3) * 3;
-    
+    const row = Math.floor(cordY / 3) * 3;
+    const col = Math.floor(cordX / 3) * 3;
+
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 3; j++) {
         if (mainArr[row + i][col + j] !== 0) {
-          localArr.push(mainArr[row + i][col + j]);
-        }  
-      }          
-    }
-    
-    return vertColl.concat(localArr.filter((e) => vertColl.indexOf(e) === -1));
-  }
-  
-  function getTotalResult(sqrColl) {
-    const arrTen = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-  
-    for (let i = 0; i < arrTen.length; i++) {
-      for (let j = 0; j < sqrColl.length; j++) {
-        if(arrTen[i] === sqrColl[j]) {
-          arrTen.splice(i, 1);
-          i--;
+          matchArr.push(mainArr[row + i][col + j]);
         }
       }
     }
-    
-    return arrTen;
+
+    return matchArr;
   }
-  
+
+  function getTotalResult(horColl, vertColl, sqrColl) {
+    const result = [];
+
+    for (let i = 1; i <= 9; i++) {
+      if (
+        !horColl.includes(i) &&
+        !vertColl.includes(i) &&
+        !sqrColl.includes(i)
+      ) {
+        result.push(i);
+      }
+    }
+
+    return result;
+  }
+
   function availableIntengers(mainArr, cordY, cordX) {
-    
-    let horColl = horisontalCollect(mainArr, cordY);
-    let vertColl = verticalCollect(mainArr, cordX, horColl);
-    let sqrColl = squareCollect(mainArr, cordY, cordX, vertColl);
-    
-      
-      return getTotalResult(sqrColl);
-  }
-  
-  function getAvailableArr(mainArr) {
-      let availableArr = [];
-      let getCordsArr = getCords(mainArr);
-  
-        availableArr.push(availableIntengers(mainArr, getCordsArr[0], getCordsArr[1]));
-    
-    return availableArr;
-  }
-  
-  function fillFinal(mainArr, currentAvVar) {
-  
-    const newArr1 = mainArr.map((e, i, arr) => {
-      return [...arr[i]];
-    });
-    const cordY = getCords(mainArr)[0];
-    const cordX = getCords(mainArr)[1];
-  
-    newArr1[cordY][cordX] = currentAvVar.shift();
-    
-    
-    return newArr1;
-  }
-  
-  function wetherEmptyCell(mainArr) {
+    const horColl = horisontalCollect(mainArr, cordY);
+    const vertColl = verticalCollect(mainArr, cordX);
+    const sqrColl = squareCollect(mainArr, cordY, cordX);
 
-  
-    return getAvailableArr(mainArr).some((elem) => {
-      return (elem.length == 0) ? true : false;
-    });
-  
+    const result = getTotalResult(horColl, vertColl, sqrColl);
 
+    return result;
   }
 
-  function wetherEmpty(mainArr, backUpArr) {
-    
-    if (wetherEmptyCell(mainArr)) {
+  const stack = [];
 
-
-      good:
-      for (;;) {  
-        if (backUpArr[backUpArr.length - 1].arrVar.length === 0) {
-          backUpArr.pop();
-          continue good;
-        } else {
-          break;
-        }
-      }
-
-      mainArr = backUpArr[backUpArr.length - 1].arr.map((e, i, arr) => {
-        return [...arr[i]];
-      });
-    } else {
-      backUpArr.push({arr: mainArr, arrVar: []});
-      for (var i = 0; i < getAvailableArr(mainArr)[0].length; i++) {
-        backUpArr[backUpArr.length - 1].arrVar.push(getAvailableArr(mainArr)[0][i]);
-      }
-    }
-  }
-  
-  let newArr = sudokuArr.map((e, i, arr) => {
-    return [...arr[i]];
+  const [cordY, cordX] = getCords(sudokuArr);
+  stack.push({
+    newArr: sudokuArr,
+    availableNums: availableIntengers(sudokuArr, cordY, cordX),
+    cordY,
+    cordX,
   });
-  
-  const backUp = [];
-  
-  
-  backUp.push({arr: newArr, arrVar: []});
-  
 
-  for (var i = 0; i < getAvailableArr(newArr)[0].length; i++) {
-    backUp[0].arrVar.push(getAvailableArr(newArr)[0][i]);
-  }
-
-  
-  let newArr1 = [];
-  
-  
-  do {
-
-    newArr1 = fillFinal(backUp[backUp.length - 1].arr, backUp[backUp.length - 1].arrVar);
-
-    if (getCords(newArr1) !== false) {
-      wetherEmpty(newArr1, backUp);
+  restart: while (true) {
+    const { newArr, availableNums, cordY, cordX } = stack[stack.length - 1];
+    if (!availableNums.length) {
+      stack.pop();
+      continue restart;
     }
 
-  } while (getCords(newArr1))
-  
-  
-  return newArr1;
+    const copyArr = newArr.map((row) => [...row]);
+
+    copyArr[cordY][cordX] = availableNums.shift();
+
+    const [newCordY, newCordX] = getCords(copyArr);
+
+    if (newCordY === undefined && newCordX === undefined) {
+      return copyArr;
+    }
+
+    const newAvailableNums = availableIntengers(copyArr, newCordY, newCordX);
+
+    stack.push({
+      newArr: copyArr,
+      availableNums: newAvailableNums,
+      cordY: newCordY,
+      cordX: newCordX,
+    });
+  }
 }
+
+module.exports = solveSudoku;
