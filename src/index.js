@@ -3,7 +3,7 @@ const play = document.getElementById("play");
 const cheatBtn = document.getElementById("cheatBtn");
 const puzzleDataInput = document.getElementById("puzzleData");
 const inputSpeed = document.getElementById("speed");
-const resolveNowBtn = document.getElementById('resolve_now');
+const resolveNowBtn = document.getElementById("resolve_now");
 
 renderSudoku(new Array(9).fill(new Array(9).fill(null)));
 
@@ -131,7 +131,6 @@ function getSudokuState(sudokuArr) {
 }
 
 let currentSpeed = +inputSpeed.value;
-let outerSudokuState;
 
 function solveSudoku(sudokuArr) {
   renderSudoku(sudokuArr);
@@ -139,7 +138,6 @@ function solveSudoku(sudokuArr) {
 
   let emptyCellCordsState = findEmptyCellCords(sudokuArr);
   let currentSudokuState = copySudokuArr(sudokuArr);
-  outerSudokuState = currentSudokuState;
   let availableNumsState = null;
 
   function fillCell() {
@@ -213,6 +211,14 @@ function solveSudoku(sudokuArr) {
   });
 
   interval = setResolvingInterval(currentSpeed);
+
+  resolveNowBtn.addEventListener("click", () => {
+    clearInterval(interval);
+
+    while (emptyCellCordsState) {
+      fillCell();
+    }
+  });
 }
 
 cheatBtn.addEventListener("click", () => {
@@ -240,9 +246,3 @@ cheatBtn.addEventListener("click", () => {
     solveSudoku(matrix);
   }
 });
-
-resolveNowBtn.addEventListener('click', () => {
-  clearInterval(interval);
-
-  solveSudoku(outerSudokuState);
-})
