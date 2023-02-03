@@ -1,0 +1,46 @@
+.container {
+    display: flex;
+    gap: 30px;
+}
+
+.sudoku_container {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    height: 300px;
+    border: 2px solid black;
+}
+
+.row {
+    flex: 1;
+    display: flex;
+    border-bottom: 1px solid grey;
+}
+
+.row:nth-child(3n) {
+    border-bottom: 2px solid black;
+}
+
+.row:last-child {
+    border-bottom: none;
+}
+
+.cell {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-right: 1px solid grey;
+}
+
+.cell:nth-child(3n) {
+    border-right: 2px solid black;
+}
+
+.cell:last-child {
+    border-right: none;
+}
+
+.interactive_container {
+    align-items: flex-start;
+}

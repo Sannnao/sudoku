@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="style.css" rel="stylesheet">
+    <script src="./index.js" defer></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="container">
+        <div class="sudoku_container">
+        </div>
+
+        <div class="interactive_container">
+            <div class="buttons_container">
+                <button id="pause">pause</button>
+                <button id="play">play</button>
+            </div>
+
+            <label>
+                <h2>Enter your sudoku puzzle data following rules:
+                </h2>
+                <ol>
+                    <li>Start from the <b>top</b> row</li>
+                    <li>Fill all numbers from <b>left</b> to <b>right</b> where <i>empty cell</i> should be a <b>0</b>
+                    </li>
+                    <li>Repeat rule <b>2</b> with every row</li>
+                </ol>
+                <input type="number" id="puzzleData">
+            </label>
+            <button id="cheatBtn">Cheat!</button>
+            <label>
+                <h3>Resolving speed</h3>
+                <input id="speed" type="range" min="50" max="1000" step="50">
+            </label>
+        </div>
+    </div>
+</body>
+
+</html>
